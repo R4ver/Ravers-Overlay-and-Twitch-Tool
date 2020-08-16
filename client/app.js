@@ -16,7 +16,7 @@ const App = () => {
 
     return (
         <>
-            <AppHeader title="r4vers' overlay changer" />
+            <AppHeader title="r4vers' overlay & twitch tool" />
             <AppNav />
             {state.isLoggedIn 
             ? (

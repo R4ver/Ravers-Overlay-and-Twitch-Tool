@@ -8,6 +8,7 @@
     --blacker: #1E1C2B;
     --blackest: #111019;
     --purple: #9147FF;
+    --purple-light: #9d5cff;    
 
     --background-color: var(--blackest);
     --element-color: #1e1c2b;
@@ -26,6 +27,10 @@ $black: var(--black);
 $blacker: var(--blacker);
 $blackest: var(--blackest);
 $purple: var(--purple);
+$purple-light: var(--purple-light);
+
+// Shadows
+$defaultShadow: 0 3px 6px rgba(0,0,0,.24);
 
 // fonts
 $OpenSans: "Open Sans", sans-serif;

@@ -25,7 +25,10 @@ Router.get("/", async (req, res) => {
             let current_game_background_url = backgrounds[channelData.game_id] ? `/games/backgrounds/${backgrounds[channelData.game_id]}` : ""
 
 
-            console.log(channel.data.data[0]);
+            storage.setItem("channel", {
+                ...channel.data.data[0],
+                current_game_background_url,
+            });
             return res.status(200).json({
                 error: false,
                 status: 200,
@@ -75,8 +78,16 @@ Router.patch("/", async ( req, res ) => {
             let current_game_background_url = `/games/backgrounds/${backgrounds[channel.data.data[0].game_id]}`
 
             if (channel.status === 200) {
-                req.app.get("socketService").emiter("channel:update", channel.data.data[0]);
+                req.app.get("socketService").emiter("channel:update", {
+                    ...channel.data.data[0],
+                    current_game_background_url
+                });
                 // console.log(req.app.get("socketService"));
+                
+                storage.setItem("channel", {
+                    ...channel.data.data[0],
+                    current_game_background_url,
+                });
                 return res.status(200).json({
                     error: false,
                     status: 200,

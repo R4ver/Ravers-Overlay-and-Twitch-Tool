@@ -1,4 +1,15 @@
 .section {
+    display: block;
     margin-bottom: 20px;
     width: 100%;
+
+    &.game-background {
+        img {
+            width: 100%;
+        }
+
+        @include breakpoint(desktop) {
+            width: 50%;
+        }
+    }
 }

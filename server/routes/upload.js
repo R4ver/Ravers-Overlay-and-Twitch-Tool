@@ -2,6 +2,8 @@ const Router = require("express").Router();
 const multer = require("multer");
 const path = require("path");
 const storage = require("node-persist");
+const glob = require("glob");
+const fs = require("fs");
 
 const handleError = (err, res) => {
     res.status(500).contentType("text/plain").end("Oops! Something went wrong!");
@@ -14,7 +16,13 @@ const allowedFiles = [
 
 var multerStorage = multer.diskStorage({
     destination: function (req, file, cb) {
-        
+        glob(`/${file.originalname}*`, {
+            root: path.resolve(__dirname, "../uploads/games/backgrounds")
+        }, function (er, files) {
+            for (const file of files) {
+                fs.unlinkSync(file);
+            }
+        });
 
         cb(null, path.resolve(__dirname, "../uploads/games/backgrounds")); //Destination folder
     },
@@ -50,15 +58,22 @@ const upload = multer({
 
 Router.post("/uploadBackground", upload.single("gameBackground"), async (req, res) => {
     console.log(req.file);
-    
+
     let backgrounds = await storage.getItem("gameBackgrounds") || {};
     backgrounds = {
         ...backgrounds,
         [req.file.originalname]: req.file.filename
     }
     
-    await storage.setItem("gameBackgrounds", backgrounds);
+    let channel = await storage.getItem("channel") || {};
+    channel.current_game_background_url = `/games/backgrounds/${req.file.filename}`;
+    await storage.setItem("channel", channel);
     
+    req.app.get("socketService").emiter("channel:update", {
+        current_game_background_url: `/games/backgrounds/${req.file.filename}`,
+    });
+    
+    await storage.setItem("gameBackgrounds", backgrounds);
     return res.status(200).json({
         error: false,
         status: 200,

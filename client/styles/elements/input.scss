@@ -3,12 +3,6 @@
     flex-direction: column;
     width: 100%;
 
-    .input-label {
-        margin-bottom: 4px;
-        color: rgba($white, .8);
-        font-size: 0.9rem;
-    }
-
     .input {
         padding: 10px;
         
@@ -16,6 +10,6 @@
         font-size: 1rem;
 
         background-color: $blacker;
-        box-shadow: 0 3px 6px rgba(0,0,0,.24);
+        box-shadow: $defaultShadow;
     }
 }

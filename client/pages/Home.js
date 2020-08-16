@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useStore } from "Store";
 import axios from "axios";
 
-import { Input } from "Components";
+import { Input, Button, UploadButton } from "Components";
 
 const Home = () => {
     const [state, setState] = useStore();
@@ -58,12 +58,14 @@ const Home = () => {
     }
 
     const handleBlur = e => {
-        const name = e.target.name;
-        setInputValues(prev => ({
-            ...prev,
-            [name]: state.channel[name]
-        }));
-        setGames([]);
+        const { name, value } = e.target;
+        if ( value === "" ) {
+            setInputValues(prev => ({
+                ...prev,
+                [name]: state.channel[name]
+            }));
+            setGames([]);
+        }
         setSkipSearch(true);
     }
 
@@ -88,12 +90,13 @@ const Home = () => {
         }
     }
 
-    const chooseGame = ({game_id, game}) => {
+    const chooseGame = ({game_id, game_name}) => {
         setInputValues((prev) => ({
             ...prev,
             game_id,
             game_name
         }));
+        setGames([]);
     }
 
     const onFileChange = async (event) => {
@@ -120,7 +123,8 @@ const Home = () => {
                 setState({
                     channel: {
                         ...state.channel,
-                        current_game_background_url: data.imagePath
+                        current_game_background_url: data.imagePath,
+                        imageId: data.imageId
                     },
                 });
             }
@@ -132,20 +136,21 @@ const Home = () => {
     console.log(inputValues, games);
 
     const gamesList = games.map(game => (
-        <li key={game.id} onClick={() => chooseGame({game_id: game.id, game: game.name})}>{game.name}</li>
+        <li key={game.id} onClick={() => chooseGame({game_id: game.id, game_name: game.name})}>{game.name}</li>
     ))
 
     return (
         <div className="page-content dashboard">
             <section className="section">
                 <Input 
-                type="text" 
-                id="title" 
-                name="title" 
-                value={inputValues.title} 
-                onChange={handleInputChange} 
-                label="Stream Title" 
-            />
+                    type="text" 
+                    id="title" 
+                    name="title" 
+                    value={inputValues.title} 
+                    onChange={handleInputChange} 
+                    label="Stream Title"
+                    autocomplete={false}
+                />
             </section>
 
             <section className="section">
@@ -159,6 +164,7 @@ const Home = () => {
                     onChange={handleInputChange}
                     onBlur={handleBlur}
                     label="Game"
+                    autocomplete="off"
                 />
                 {games.length > 0 &&
                     <ul>
@@ -166,15 +172,14 @@ const Home = () => {
                     </ul>
                 }
             </section>
-            <section className="section">
-                <button onClick={updateChannel}>Update Information</button>
-            </section>
 
             <section className="section game-background">
-                <input type="file" accept="image/png" onChange={onFileChange} />
-                {state.channel.current_game_background_url &&
-                    <img src={state.channel.current_game_background_url} />
-                }
+                <label className="label">Game Wallpaper</label>
+                <UploadButton image={state.channel.current_game_background_url} onChange={onFileChange} />
+            </section>
+
+            <section className="section">
+                <Button value="UPDATE" onClick={updateChannel} className="fill is-bottom-fixed"/>
             </section>
         </div>
     );
