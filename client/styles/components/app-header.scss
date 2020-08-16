@@ -1,0 +1,17 @@
+.app-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+
+    background: radial-gradient(at bottom, #{$blacker} 0%, transparent 70%);
+
+    h1, h2 {
+        font-weight: $fwLight;
+    }
+
+    h1 {
+        font-size: 1.25rem;
+        text-transform: uppercase;
+    }
+}

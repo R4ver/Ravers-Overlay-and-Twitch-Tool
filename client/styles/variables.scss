@@ -1,0 +1,34 @@
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;700&display=swap");
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css");
+
+:root {
+    // generic-colors
+    --color-red: #F7193E;
+    --black: #302D45;
+    --blacker: #1E1C2B;
+    --blackest: #111019;
+    --purple: #9147FF;
+
+    --background-color: var(--blackest);
+    --element-color: #1e1c2b;
+    --element-color-hover: hsl(248, 21%, 16%);
+}
+
+$--background-color: var(--background-color);
+$--element-color: var(--element-color);
+$--element-color-hover: var(--element-color-hover);
+
+// generic colors
+$white: #fff;
+
+$red: var(--color-red);
+$black: var(--black);
+$blacker: var(--blacker);
+$blackest: var(--blackest);
+$purple: var(--purple);
+
+// fonts
+$OpenSans: "Open Sans", sans-serif;
+$fwLight: 300;
+$fwRegular: 400;
+$fwBold: 700;

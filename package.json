@@ -1,0 +1,55 @@
+{
+  "name": "overlay-changer-service",
+  "version": "1.0.0",
+  "description": "A service which interacts with the user and Twitch",
+  "main": "main.js",
+  "scripts": {
+    "start": "concurrently \"cross-env BROWSER=none npm run react-start\" \"npm run server-start \"",
+    "react-start": "parcel watch ./client/index.js",
+    "server-start": "node ./server/index.js",
+    "react-build": "parcel build ./client/index.html",
+    "build": "rm -rf dist && npm run react-build"
+  },
+  "build": {
+    "appId": "com.r4ver.ocft",
+    "target": "nsis"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "alias": {
+    "Store": "./client/store",
+    "Components": "./client/components",
+    "Pages": "./client/pages"
+  },
+  "dependencies": {
+    "axios": "^0.19.2",
+    "cookie-parser": "^1.4.5",
+    "cookie-session": "^1.4.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "multer": "^1.4.2",
+    "node-persist": "^3.1.0",
+    "node-windows": "^1.0.0-beta.5",
+    "parcel-bundler": "^1.12.4",
+    "passport": "^0.4.1",
+    "passport-oauth2": "^1.5.0",
+    "passport-oauth2-refresh": "^2.0.0",
+    "react": "^16.13.1",
+    "react-debounce-input": "^3.2.2",
+    "react-dom": "^16.13.1",
+    "react-router-dom": "^5.2.0",
+    "s": "^1.0.0",
+    "socket.io": "^2.3.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.10.3",
+    "@babel/plugin-transform-runtime": "^7.10.3",
+    "@babel/preset-react": "^7.10.1",
+    "concurrently": "^5.2.0",
+    "cross-env": "^7.0.2",
+    "sass": "^1.26.9",
+    "wait-on": "^5.0.1"
+  }
+}
