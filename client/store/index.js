@@ -29,7 +29,7 @@ export const StoreProvider = ({children}) => {
                     setDoAuth(true);
                 }
                 const { status: channelStatus, channel } = await ( await fetch(`/api/channel`) ).json();
-                
+                console.log(channel);
                 
                 if (userStatus === 200 && channelStatus === 200) {
                     setState({

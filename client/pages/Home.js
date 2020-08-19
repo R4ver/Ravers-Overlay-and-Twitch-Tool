@@ -36,12 +36,18 @@ const Home = () => {
                     },
                 });
                 
-                if ( result.status === 200 ) {
-                    setGames(result.data.searchData ? result.data.searchData : []);
-                }
+                console.log(result.error);
+
+                setGames(result.data.searchData ? result.data.searchData : []);
 
             } catch (error) {
                 console.log(error);
+                setGames([
+                    {
+                        id: null,
+                        name: "No games found",
+                    },
+                ]);
             }
         })()
 
@@ -81,7 +87,6 @@ const Home = () => {
                 setState({
                     channel
                 })
-                setGames([])
             }
 
             
@@ -91,6 +96,8 @@ const Home = () => {
     }
 
     const chooseGame = ({game_id, game_name}) => {
+        if ( !game_id ) return;
+
         setInputValues((prev) => ({
             ...prev,
             game_id,
@@ -99,7 +106,7 @@ const Home = () => {
         setGames([]);
     }
 
-    const onFileChange = async (event) => {
+    const onFileChange = async (event, isDefault = false) => {
         try {
             const file = event.target.files[0];
     
@@ -110,7 +117,7 @@ const Home = () => {
             formData.append( 
                 "gameBackground", 
                 file, 
-                state.channel.game_id
+                isDefault ? "default" : state.channel.game_id
             ); 
     
             // Request made to the backend api 
@@ -123,8 +130,8 @@ const Home = () => {
                 setState({
                     channel: {
                         ...state.channel,
-                        current_game_background_url: data.imagePath,
-                        imageId: data.imageId
+                        current_game_background_url: data.current_game_background_url,
+                        default_background_url: data.default_background_url
                     },
                 });
             }
@@ -149,7 +156,7 @@ const Home = () => {
                     value={inputValues.title} 
                     onChange={handleInputChange} 
                     label="Stream Title"
-                    autocomplete={false}
+                    autoComplete="off"
                 />
             </section>
 
@@ -158,13 +165,13 @@ const Home = () => {
                     id="game" 
                     name="game_name"
                     value={inputValues.game_name}
-                    minLength={5}
+                    minLength={3}
                     debounce={true}
                     debounceTimeout={500}
                     onChange={handleInputChange}
                     onBlur={handleBlur}
                     label="Game"
-                    autocomplete="off"
+                    autoComplete="off"
                 />
                 {games.length > 0 &&
                     <ul>
@@ -178,8 +185,13 @@ const Home = () => {
                 <UploadButton image={state.channel.current_game_background_url} onChange={onFileChange} />
             </section>
 
+            <section className="section game-background">
+                <label className="label">Default Wallpaper</label>
+                <UploadButton image={state.channel.default_background_url} onChange={(e) => onFileChange(e, true)} />
+            </section>
+
             <section className="section">
-                <Button value="UPDATE" onClick={updateChannel} className="fill is-bottom-fixed"/>
+                <Button onClick={updateChannel} className="fill is-floating" iconType="fas" icon="save" />
             </section>
         </div>
     );

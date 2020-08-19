@@ -13,6 +13,14 @@
         background-color: $purple-light;
     }
 
+    span:only-child {
+        margin: 0;
+
+        .icon {
+            margin: 0;
+        }
+    }
+
     &.fill {
         width: 100%;
     }
@@ -21,6 +29,27 @@
         position: fixed;
         left: 0;
         bottom: 0;
+    }
+
+    &.is-floating {
+        $buttonSize: 50px;
+
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        width: $buttonSize;
+        height: $buttonSize;
+
+        border-radius: 50%;
+        box-shadow: $floatingShadow;
+
+        $buttonSize: 70px;
+        @include breakpoint(desktop) {
+            right: 20%;
+            bottom: 60px;
+            width: $buttonSize;
+            height: $buttonSize;
+        }
     }
 
     &.is-upload {

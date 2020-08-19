@@ -1,17 +1,7 @@
-const Router = require("express").Router();
-const storage = require("node-persist");
-
 const api = require("../api");
+const { getLocalImagesURI, saveAndCreateReponse } = require("../helpers");
 
-Router.get("/", async (req, res) => {
-    if ( !req.user ) {
-        return res.status(401).json({
-            error: true,
-            status: 401,
-            message: "No User"
-        })
-    }
-
+const getChannel = async (req, res) => {
     try {
         const channel = await api.get("/channels", {
             params: {
@@ -19,44 +9,25 @@ Router.get("/", async (req, res) => {
             },
         });
 
-        if ( channel.status === 200 ) {
+        if ( channel && channel.status === 200 ) {
             let channelData = channel.data.data[0];
-            const backgrounds = await storage.getItem("gameBackgrounds") || [];
-            let current_game_background_url = backgrounds[channelData.game_id] ? `/games/backgrounds/${backgrounds[channelData.game_id]}` : ""
+            const backgrounds = await getLocalImagesURI(channelData.game_id);
 
-
-            storage.setItem("channel", {
-                ...channel.data.data[0],
-                current_game_background_url,
-            });
-            return res.status(200).json({
-                error: false,
-                status: 200,
-                channel: {
+            return await saveAndCreateReponse({
+                res,
+                storageKey: "channel",
+                data: {
                     ...channel.data.data[0],
-                    current_game_background_url
+                    ...backgrounds,
                 },
             });
         }
     } catch (error) {
-        console.log(error);
-        return res.status(500).json({
-            error: true,
-            message: "Failed to get channel",
-            errorMessage: error
-        })
+        next(new api.ApiError(401, error, "Failed to get channel"));
     }
-})
+}
 
-Router.patch("/", async ( req, res ) => {
-    if ( !req.user ) {
-        return res.status(401).json({
-            error: true,
-            status: 401,
-            message: "No User",
-        });
-    }
-
+const patchChannel = async ( req, res, next ) => {
     try {
         const { title, game_id } = req.body;
         const channel = await api.patch("/channels", {
@@ -74,39 +45,36 @@ Router.patch("/", async ( req, res ) => {
                     broadcaster_id: parseInt(req.user.id),
                 },
             });
-            const backgrounds = await storage.getItem("gameBackgrounds");
-            let current_game_background_url = `/games/backgrounds/${backgrounds[channel.data.data[0].game_id]}`
 
+            
             if (channel.status === 200) {
+                const backgrounds = await getLocalImagesURI(channel.data.data[0].game_id);
+
                 req.app.get("socketService").emiter("channel:update", {
                     ...channel.data.data[0],
-                    current_game_background_url
+                    ...backgrounds
                 });
-                // console.log(req.app.get("socketService"));
-                
-                storage.setItem("channel", {
-                    ...channel.data.data[0],
-                    current_game_background_url,
-                });
-                return res.status(200).json({
-                    error: false,
-                    status: 200,
-                    channel: {
+
+                return await saveAndCreateReponse({
+                    res,
+                    storageKey: "channel",
+                    data: {
                         ...channel.data.data[0],
-                        current_game_background_url
-                    }
+                        ...backgrounds,
+                    },
                 });
             }
         }
 
     } catch (error) {
-        console.log(error);
-        return res.status(500).json({
-            error: true,
-            message: "Failed to update channel",
-            errorMessage: error,
-        });
+        next(new api.ApiError(500, error, "Failed to update channel"));
     }
-})
+}
 
-module.exports = Router;
+const PATH = "/api/channel";
+module.exports.register = router => {
+    router.get(PATH, getChannel);
+    router.patch(PATH, patchChannel);
+
+    return router;
+};

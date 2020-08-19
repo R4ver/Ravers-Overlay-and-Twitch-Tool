@@ -6,7 +6,7 @@ import Home from "Pages/Home";
 import Tools from "Pages/Tools";
 
 
-import { AppHeader, AppNav } from "Components";
+import { AppHeader, AppNav, Icon } from "Components";
 
 const App = () => {
     const location = useLocation();
@@ -16,26 +16,27 @@ const App = () => {
 
     return (
         <>
-            <AppHeader title="r4vers' overlay & twitch tool" />
-            <AppNav />
+            <AppHeader title="ROTT" />
             {state.isLoggedIn 
             ? (
-                <Switch>
-                    <Route exact path="/">
-                        <Home />
-                    </Route>
+                <>
+                    <AppNav />
+                    <Switch>
+                        <Route exact path="/">
+                            <Home />
+                        </Route>
 
-                    <Route exact path="/tools">
-                        <Tools />
-                    </Route>
-                </Switch>
+                        <Route exact path="/tools">
+                            <Tools />
+                        </Route>
+                    </Switch>
+                </>
             ) : (
                 <Route exact path="/login">
                     <>
-                        {console.log("Test")}
-                        <h1>Welcome to my app: Login</h1>
                         <a className="button" href={`http://localhost:${process.env.PORT}/auth/twitch`}>
-                            Sign In
+                            <Icon type="fab" icon="twitch" />
+                            Sign in
                         </a>
                     </>
                 </Route>

@@ -7,6 +7,9 @@
     var svc = new Service({
         name: "R4vers Overlay Changer Service",
         description: "Express server to handle overlay changes for R4ver",
+        nodeOptions: [
+            "-r esm"
+        ],
         script: path.resolve(__dirname, "./server/index.js"),
     });
 

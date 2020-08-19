@@ -1,0 +1,11 @@
+.icon {
+    font-size: 1.7rem;
+
+    &.is-left {
+        margin-right: 8px;
+    }
+
+    &.is-right {
+        margin-left: 8px;
+    }
+}

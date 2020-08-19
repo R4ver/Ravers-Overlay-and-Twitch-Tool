@@ -1,19 +1,7 @@
-const Router = require("express").Router();
-
 const api = require("../api");
 
-Router.get("/", async (req, res) => {
+module.exports = async (req, res, next) => {
     const { query, first = 10 } = req.query;
-    console.log(query);
-
-    if (!req.user) {
-        return res.status(401).json({
-            error: true,
-            status: 401,
-            message: "No User",
-        });
-    }
-
     try {
         const searchRes = await api.get("/search/categories", {
             params: {
@@ -22,23 +10,14 @@ Router.get("/", async (req, res) => {
             },
         });
 
-        
-        if (searchRes.status === 200) {
-            console.log("Search result: ", searchRes);
-            return res.status(200).json({
-                error: false,
-                status: 200,
-                searchData: searchRes.data.data,
-            });
-        }
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({
-            error: true,
-            message: "Failed to search",
-            errorMessage: error,
-        });
-    }
-});
+        if ( !searchRes.data.data ) throw new Error("No results.");
 
-module.exports = Router;
+        return res.status(200).json({
+            error: false,
+            status: 200,
+            searchData: searchRes.data.data,
+        });
+    } catch (error) {
+        next(new api.ApiError(404, error, "Failed to search"));
+    }
+};

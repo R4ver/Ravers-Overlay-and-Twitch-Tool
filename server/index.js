@@ -1,4 +1,3 @@
-
 require("dotenv").config();
 const path = require("path");
 const fs = require("fs");
@@ -9,6 +8,7 @@ const cookieParser = require("cookie-parser");
 const cookieSession = require("cookie-session");
 const passport = require("passport");
 const OAuth2Strategy = require("passport-oauth2").Strategy;
+const checkAuth = require("./middleware/checkAuth");
 const api = require("./api");
 const SocketService = require("./SocketService");
 const storage = require("node-persist");
@@ -75,20 +75,16 @@ app.get('/auth/twitch/callback', passport.authenticate('oauth2', { failureRedire
 });
 //========================================================================================================
 
-app.use("/api/user", require("./routes/user"));
+app.use("/api/*", checkAuth);
+
+app.use("/api/user/currentUser", require("./routes/user"));
 
 // Twitch related endpoints
-app.use("/api/channel", require("./routes/channel"));
+require("./routes/channel").register(app);
 app.use("/api/search", require("./routes/search"));
 
 // Upload game background
-app.use("/api/game", require("./routes/upload"));
-
-app.get("/api/hello", (req, res) => {
-    return res.json({
-        message: "Hello world"
-    })
-})
+require("./routes/upload").register(app);
 
 app.use("/games", express.static(path.join(__dirname, "./uploads/games")));
 app.use(express.static(path.join(__dirname, "../dist")))
@@ -106,6 +102,19 @@ app.get("*", async (req, res) => {
 
     res.sendFile(path.join(__dirname + "./../index.html"));
 });
+
+app.use( (err, req, res, next) => {
+    if ( !err ) return next();
+    console.log("hello");
+    console.log(typeof err);
+    if ( err instanceof api.ApiError ) {
+        return res.status(err.status).json({
+            error: true,
+            message: err.message,
+            errorMessage: err.errorMessage.toString(),
+        });
+    }
+})
 
 http.listen(process.env.PORT || 6969, async () => {
     await storage.init({

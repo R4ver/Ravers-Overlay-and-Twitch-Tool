@@ -1,13 +1,8 @@
-const Router = require("express").Router();
 const multer = require("multer");
 const path = require("path");
 const storage = require("node-persist");
 const glob = require("glob");
 const fs = require("fs");
-
-const handleError = (err, res) => {
-    res.status(500).contentType("text/plain").end("Oops! Something went wrong!");
-};
 
 const maxSize = 3 * 1024 * 1024;
 const allowedFiles = [
@@ -33,7 +28,7 @@ var multerStorage = multer.diskStorage({
         cb(null, `${file.originalname}.${Date.now()}${fileObj[file.mimetype]}`) //File name after saving
     }
 })
-const upload = multer({
+const handleFile = multer({
     dest: path.resolve(__dirname, "../uploads/games/backgrounds"),
     fileFilter: function fileFilter(req, file, cb) {
         // The function should call `cb` with a boolean
@@ -56,7 +51,7 @@ const upload = multer({
     // you might also want to set some limits: https://github.com/expressjs/multer#limits
 });
 
-Router.post("/uploadBackground", upload.single("gameBackground"), async (req, res) => {
+const Upload = async (req, res) => {
     console.log(req.file);
 
     let backgrounds = await storage.getItem("gameBackgrounds") || {};
@@ -66,11 +61,14 @@ Router.post("/uploadBackground", upload.single("gameBackground"), async (req, re
     }
     
     let channel = await storage.getItem("channel") || {};
-    channel.current_game_background_url = `/games/backgrounds/${req.file.filename}`;
+    channel.current_game_background_url = backgrounds[channel.game_id] ? `/games/backgrounds/${backgrounds[channel.game_id]}` : null;
+    channel.default_background_url = backgrounds.default ? `/games/backgrounds/${backgrounds.default}` : null;
+
     await storage.setItem("channel", channel);
     
     req.app.get("socketService").emiter("channel:update", {
-        current_game_background_url: `/games/backgrounds/${req.file.filename}`,
+        current_game_background_url: channel.current_game_background_url,
+        default_background_url: channel.default_background_url,
     });
     
     await storage.setItem("gameBackgrounds", backgrounds);
@@ -78,8 +76,12 @@ Router.post("/uploadBackground", upload.single("gameBackground"), async (req, re
         error: false,
         status: 200,
         message: "Image uploaded!",
-        imagePath: `/games/backgrounds/${req.file.filename}`
-    })
-});
+        current_game_background_url: channel.current_game_background_url,
+        default_background_url: channel.default_background_url
+    });
+};
 
-module.exports = Router;
+const PATH = "/api/game/uploadBackground";
+module.exports.register = router => {
+    router.post(PATH, handleFile.single("gameBackground"), Upload);
+};

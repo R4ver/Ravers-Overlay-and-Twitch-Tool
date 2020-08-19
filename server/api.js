@@ -20,7 +20,7 @@ axios.interceptors.request.use(
 module.exports = {
     get: async (path, options) => {
         try {
-            const res = await axios.get(`${API_URL}${path}`, {...options});
+            const res = await axios.get(`${API_URL}${path}`, { ...options });
 
             return res;
         } catch (error) {
@@ -32,7 +32,7 @@ module.exports = {
         try {
             const res = axios.post(`${API_URL}${path}`, body, { ...options });
 
-            return res
+            return res;
         } catch (error) {
             console.log(`Failed to post: ${path}. `, error);
         }
@@ -65,6 +65,14 @@ module.exports = {
                 error: true,
                 status: 401,
             };
+        }
+    },
+
+    ApiError: class ApiError {
+        constructor(status, errorMessage, message) {
+            this.status = status;
+            this.errorMessage = errorMessage;
+            this.message = message;
         }
     },
 };
