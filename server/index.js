@@ -1,6 +1,10 @@
-require("dotenv").config();
 const path = require("path");
-const fs = require("fs");
+const dotenvAbsolutePath = path.join(__dirname, "../.env");
+require("dotenv").config({
+    path: dotenvAbsolutePath,
+});
+
+const fs = require("fs-extra");
 const express = require("express");
 const app = express();
 const http = require("http").createServer(app);
@@ -12,9 +16,13 @@ const checkAuth = require("./middleware/checkAuth");
 const api = require("./api");
 const SocketService = require("./SocketService");
 const storage = require("node-persist");
+const RootPath = require("./helpers/RootPath");
+const { dirname } = require( "path" );
 app.set("json spaces", 4);
 
-!fs.existsSync(path.resolve(__dirname, `./server/uploads/games/backgrounds`)) && fs.mkdirSync(`./server/uploads/games/backgrounds`, { recursive: true });
+storage.init({
+    dir: `${RootPath.storage}`,
+});
 
 // app.use(cors());
 app.use(cookieParser());
@@ -86,27 +94,28 @@ app.use("/api/search", require("./routes/search"));
 // Upload game background
 require("./routes/upload").register(app);
 
-app.use("/games", express.static(path.join(__dirname, "./uploads/games")));
+app.use("/games", express.static(`${RootPath.upload}/games`));
 app.use(express.static(path.join(__dirname, "../dist")))
 
 let initialStart = true;
 app.get("*", async (req, res) => {
-    if ( initialStart ) {
-        initialStart = false;
-        const auth = await api.checkAuth(req);
-        console.log("The auth response", auth);
-        if ( auth.error && auth.status === 401 ) {
-            res.redirect("/login");
-        }
-    }
-
-    res.sendFile(path.join(__dirname + "./../index.html"));
+    // if ( initialStart ) {
+    //     initialStart = false;
+    //     const auth = await api.checkAuth(req);
+    //     console.log("The auth response", auth);
+    //     if ( auth.error && auth.status === 401 ) {
+    //         res.redirect("/login");
+    //     }
+    // }
+    // console.log("Trying to send index file");
+    // res.json({
+    //     message: "Hello world"
+    // })
+    res.sendFile(path.join(__dirname + "./../dist/index.html"));
 });
 
 app.use( (err, req, res, next) => {
     if ( !err ) return next();
-    console.log("hello");
-    console.log(typeof err);
     if ( err instanceof api.ApiError ) {
         return res.status(err.status).json({
             error: true,
@@ -117,9 +126,7 @@ app.use( (err, req, res, next) => {
 })
 
 http.listen(process.env.PORT || 6969, async () => {
-    await storage.init({
-        dir: path.resolve(__dirname, "./storage")
-    })
+    await fs.ensureDir(`${RootPath.upload}/games/backgrounds`);
 });
 
 app.set("socketService", new SocketService(http));

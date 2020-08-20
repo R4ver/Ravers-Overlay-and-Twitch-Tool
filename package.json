@@ -2,17 +2,24 @@
   "name": "overlay-changer-service",
   "version": "1.0.0",
   "description": "A service which interacts with the user and Twitch",
-  "main": "main.js",
   "scripts": {
-    "start": "concurrently \"cross-env BROWSER=none npm run react-start\" \"npm run server-start \"",
-    "react-start": "parcel watch ./client/index.js",
+    "start": "SET NODE_ENV=development&& concurrently \"cross-env BROWSER=none npm run react-start\" \"npm run server-start \"",
+    "react-start": "parcel watch ./client/index.html",
     "server-start": "nodemon -r esm ./server/index.js",
     "react-build": "parcel build ./client/index.html",
-    "build": "rm -rf dist && npm run react-build"
+    "build": "SET NODE_ENV=production&& rm -rf dist && npm run react-build && pkg . --targets node12-win-x64 --out-path build"
   },
-  "build": {
-    "appId": "com.r4ver.ocft",
-    "target": "nsis"
+  "bin": "./server/index.js",
+  "pkg": {
+    "scripts": [
+      "./server/**/*.js"
+    ],
+    "assets": [
+      "dist/**/*"
+    ],
+    "targets": [
+      "node12"
+    ]
   },
   "keywords": [],
   "author": "",
@@ -31,6 +38,7 @@
     "dotenv": "^8.2.0",
     "esm": "^3.2.25",
     "express": "^4.17.1",
+    "fs-extra": "^9.0.1",
     "glob": "^7.1.6",
     "multer": "^1.4.2",
     "node-persist": "^3.1.0",

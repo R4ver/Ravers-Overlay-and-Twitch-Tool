@@ -24,22 +24,17 @@ export const StoreProvider = ({children}) => {
         (async () => {
             try {
                 const { status: userStatus, user } = await (await fetch(`/api/user/currentUser`) ).json();
-                console.log(userStatus);
-                if ( userStatus === 401 ) {
-                    setDoAuth(true);
-                }
+                if ( !user ) return;
                 const { status: channelStatus, channel } = await ( await fetch(`/api/channel`) ).json();
-                console.log(channel);
                 
-                if (userStatus === 200 && channelStatus === 200) {
-                    setState({
-                        user,
-                        channel,
-                        isLoggedIn: true,
-                    });
-                }
+                setState({
+                    user,
+                    channel,
+                    isLoggedIn: true,
+                });
             } catch (error) {
                 console.log("failed to login: ", error);
+                setDoAuth(true);
             }
         })();
     }, [])
@@ -47,7 +42,6 @@ export const StoreProvider = ({children}) => {
     console.log(state, doAuth);
     if ( doAuth ) {
         console.log("Doing auth");
-        return <Redirect to="/login" />
     }
 
     return <Provider value={[state, setState]}>{children}</Provider>;

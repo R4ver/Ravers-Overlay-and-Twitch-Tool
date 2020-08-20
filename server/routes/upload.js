@@ -3,6 +3,7 @@ const path = require("path");
 const storage = require("node-persist");
 const glob = require("glob");
 const fs = require("fs");
+const RootPath = require("../helpers/RootPath");
 
 const maxSize = 3 * 1024 * 1024;
 const allowedFiles = [
@@ -12,14 +13,15 @@ const allowedFiles = [
 var multerStorage = multer.diskStorage({
     destination: function (req, file, cb) {
         glob(`/${file.originalname}*`, {
-            root: path.resolve(__dirname, "../uploads/games/backgrounds")
+            root: `${RootPath.upload}/games/backgrounds`
         }, function (er, files) {
             for (const file of files) {
                 fs.unlinkSync(file);
             }
+            
+            cb(null, `${RootPath.upload}/games/backgrounds`); //Destination folder
         });
 
-        cb(null, path.resolve(__dirname, "../uploads/games/backgrounds")); //Destination folder
     },
     filename: function (req, file, cb) {        
         var fileObj = {
@@ -29,17 +31,17 @@ var multerStorage = multer.diskStorage({
     }
 })
 const handleFile = multer({
-    dest: path.resolve(__dirname, "../uploads/games/backgrounds"),
+    dest: `${RootPath.upload}/games/backgrounds`,
     fileFilter: function fileFilter(req, file, cb) {
         // The function should call `cb` with a boolean
         // to indicate if the file should be accepted
-        
+
         // To reject this file pass `false`, like so:
         console.log(!allowedFiles.find((e) => e === file.mimetype));
         if (!allowedFiles.find((e) => e === file.mimetype)) {
             cb(null, false);
         }
-        
+
         cb(null, true);
         // You can always pass an error if something goes wrong:
         // cb(new Error("I don't have a clue!"));

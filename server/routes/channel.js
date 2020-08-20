@@ -1,7 +1,7 @@
 const api = require("../api");
 const { getLocalImagesURI, saveAndCreateReponse } = require("../helpers");
 
-const getChannel = async (req, res) => {
+const getChannel = async (req, res, next) => {
     try {
         const channel = await api.get("/channels", {
             params: {
@@ -12,6 +12,11 @@ const getChannel = async (req, res) => {
         if ( channel && channel.status === 200 ) {
             let channelData = channel.data.data[0];
             const backgrounds = await getLocalImagesURI(channelData.game_id);
+
+            req.app.get("socketService").emiter("channel:update", {
+                ...channel.data.data[0],
+                ...backgrounds,
+            }); 
 
             return await saveAndCreateReponse({
                 res,

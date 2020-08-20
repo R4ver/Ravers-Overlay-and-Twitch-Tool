@@ -32,7 +32,7 @@ const App = () => {
                     </Switch>
                 </>
             ) : (
-                <Route exact path="/login">
+                <Route exact path="/">
                     <>
                         <a className="button" href={`http://localhost:${process.env.PORT}/auth/twitch`}>
                             <Icon type="fab" icon="twitch" />

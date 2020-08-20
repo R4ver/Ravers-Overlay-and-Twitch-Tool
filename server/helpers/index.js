@@ -1,6 +1,6 @@
-import storage from "node-persist";
+const storage = require("node-persist");
 
-export const getLocalImagesURI = async (game_id) => {
+exports.getLocalImagesURI = async (game_id) => {
     const backgrounds = await storage.getItem("gameBackgrounds") || {};
 
     let current_game_background_url = backgrounds[game_id] ? `/games/backgrounds/${backgrounds[game_id]}` : null;
@@ -12,7 +12,7 @@ export const getLocalImagesURI = async (game_id) => {
     }
 }
 
-export const saveAndCreateReponse = async ({
+exports.saveAndCreateReponse = async ({
     res,
     status = 200,
     error = null,
