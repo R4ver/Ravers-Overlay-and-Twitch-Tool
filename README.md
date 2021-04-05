@@ -1,11 +1,11 @@
+**This tool was more or less quickly thrown together to have a working tool after the shutdown of mixer.com and is by no means tested or ready to be used by someone with no knowledge of how to get the tool build.**
+**This repo is currently being refactored to only be the backend service for the frontend and run on an web server compared to the current build of an `exe` file.**
+
 # R4VERS OVERLAY CHANGER
 A small tool written in ReactJS together with ExpressJS to handle Twitch API interaction.
 
 Provides a small installable service which runs the server and serves the React application to then be used in OBS or standalone in a browser.
 There's also a Socket.io server setup to be used in overlays, as an example, to mimic a Mixer (rip) constellation like service since Twitch isn't providing what I need.
-
-!!**This repo is currently being refactored to only be the backend service for the frontend and run on an web server compared to the current build of an `exe` file**!!
-
 ---
 ## Environment
 ```
